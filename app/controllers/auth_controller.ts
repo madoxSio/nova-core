@@ -2,16 +2,30 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 import User from '#models/user'
 import hash from '@adonisjs/core/services/hash'
+import { createAuthValidator } from '#validators/auth'
 
 export default class AuthController {
-  public async register({ request, response }: HttpContext) {
-    const data = request.only(['email', 'password'])
+  /**
+   * @store
+   * @description Register a new user
+   * @requestBody <createAuthValidator>
+   * @responseBody 201 - <User>
+   * @responseHeader 201 - X-pages - A description of the header - @example(test)
+   */
+  public async store({ request, response }: HttpContext) {
+    const payload = await createAuthValidator.validate(request.only(['email', 'password']))
 
-    const user = await User.create(data)
+    const user = await User.create(payload)
     return response.created({ user })
   }
 
-  public async login({ request, auth, response }: HttpContext) {
+  /**
+   * @index
+   * @description Login a user
+   * @requestBody <User>
+   * @responseBody 200 - <User>
+   */
+  public async index({ request, auth, response }: HttpContext) {
     const { email, password } = request.only(['email', 'password'])
 
     const user = await User.findBy('email', email)
