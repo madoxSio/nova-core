@@ -38,8 +38,8 @@ router
           .group(() => {
             // Auth routes
             router.post('/register', [AuthController, 'store'])
-            router.post('/login', [AuthController, 'index'])
-            router.post('/logout', [AuthController, 'logout']).use(
+            router.post('/login', [AuthController, 'login'])
+            router.post('/logout', [AuthController, 'destroy']).use(
               middleware.auth({
                 guards: ['api'],
               })

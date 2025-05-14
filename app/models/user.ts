@@ -6,43 +6,47 @@ import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import Post from '#models/post'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
+import { UserRole } from '../types/enums.js'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
   passwordColumnName: 'password',
 })
 
-export enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user',
-}
-
 export default class User extends compose(BaseModel, AuthFinder) {
   @column({ isPrimary: true })
   declare id: number
 
   @column()
+  // @enum(user, admin)
   declare role: UserRole
 
   @column()
+  // @example(sagby)
   declare username: string
 
   @column()
+  // @example(Salah)
   declare firstName: string
 
   @column()
+  // @example(Gory)
   declare lastName: string
 
   @column()
+  // @example(1990-01-01)
   declare birthDate: Date
 
   @column()
+  // @example(sagby@gmail.com)
   declare email: string
 
   @column({ serializeAs: null })
+  // @example(MyP@ssw0rd!)
   declare password: string
 
   @hasMany(() => Post)
+  // @no-swagger
   declare posts: HasMany<typeof Post>
 
   @column.dateTime({ autoCreate: true })
@@ -52,6 +56,6 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare updatedAt: DateTime | null
 
   static accessTokens = DbAccessTokensProvider.forModel(User, {
-    expiresIn: '30m',
+    expiresIn: '30d',
   })
 }
