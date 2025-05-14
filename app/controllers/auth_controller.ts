@@ -51,4 +51,15 @@ export default class AuthController {
     const token = await auth.use('api').createToken(user)
     return token
   }
+
+  /**
+   * @logout
+   * @description Logout a user
+   * @requestBody <User>
+   * @responseBody 200 - <User>
+   */
+  public async logout({ auth, response }: HttpContext) {
+    await auth.use('api').invalidateToken()
+    return response.json({ message: 'Logged out' })
+  }
 }

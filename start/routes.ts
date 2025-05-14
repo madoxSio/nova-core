@@ -10,6 +10,7 @@
 import router from '@adonisjs/core/services/router'
 import AutoSwagger from 'adonis-autoswagger'
 import swagger from '#config/swagger'
+import { middleware } from './kernel.js'
 
 const AuthController = () => import('#controllers/auth_controller')
 const UsersController = () => import('#controllers/users_controller')
@@ -38,6 +39,11 @@ router
             // Auth routes
             router.post('/register', [AuthController, 'store'])
             router.post('/login', [AuthController, 'index'])
+            router.post('/logout', [AuthController, 'logout']).use(
+              middleware.auth({
+                guards: ['api'],
+              })
+            )
           })
           .prefix('/auth')
 
