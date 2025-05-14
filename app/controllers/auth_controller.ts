@@ -13,10 +13,20 @@ export default class AuthController {
    * @responseHeader 201 - X-pages - A description of the header - @example(test)
    */
   public async store({ request, response }: HttpContext) {
-    const payload = await createAuthValidator.validate(request.only(['email', 'password']))
+    const payload = await createAuthValidator.validate(
+      request.only(['email', 'password', 'firstName', 'lastName', 'birthDate', 'username'])
+    )
+
+    if (await User.findBy('email', payload.email)) {
+      return response.badRequest({ message: 'Email already exists' })
+    }
+
+    if (await User.findBy('username', payload.username)) {
+      return response.badRequest({ message: 'Username already exists' })
+    }
 
     const user = await User.create(payload)
-    return response.created({ user })
+    return response.created(user)
   }
 
   /**
