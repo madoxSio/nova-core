@@ -51,8 +51,10 @@ router
           .group(() => {
             // Users routes
             router.get('/', [UsersController, 'index'])
+            router.get('/me', [UsersController, 'me'])
             router.get('/:id', [UsersController, 'show'])
           })
+          .middleware(middleware.auth({ guards: ['api'] }))
           .prefix('/users')
 
         router
@@ -65,6 +67,7 @@ router
             router.delete('/:id', [PostsController, 'destroy'])
             router.post('/:id/like', [PostsController, 'like'])
           })
+          .middleware(middleware.auth({ guards: ['api'] }))
           .prefix('/posts')
       })
       .prefix('/v1')

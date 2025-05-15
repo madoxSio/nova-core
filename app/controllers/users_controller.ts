@@ -8,9 +8,10 @@ export default class UsersController {
    * @requestBody <User>
    * @responseBody 200 - <User>
    */
-  public async index({ request, response }: HttpContext) {
+  public async index({ auth, request, response, logger }: HttpContext) {
     const { page, perPage } = request.only(['page', 'perPage'])
     const users = await User.query().paginate(page, perPage)
+    logger.info({ auth: auth.user?.username }, 'Users fetched by')
     return response.json(users)
   }
 
@@ -26,6 +27,22 @@ export default class UsersController {
 
     if (!user) {
       return response.notFound({ message: 'User not found' })
+    }
+
+    return response.json(user)
+  }
+
+  /**
+   * @me
+   * @summary Get the current user
+   * @description Get the current user
+   * @requestBody <User>
+   * @responseBody 200 - <User>
+   */
+  public async me({ auth, response }: HttpContext) {
+    const user = auth.user
+    if (!user) {
+      return response.unauthorized({ message: 'Not authenticated' })
     }
 
     return response.json(user)
