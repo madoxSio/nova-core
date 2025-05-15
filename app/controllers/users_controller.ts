@@ -23,6 +23,11 @@ export default class UsersController {
    */
   public async show({ request, response }: HttpContext) {
     const { id } = request.params()
+
+    if (Number.isNaN(+id)) {
+      return response.badRequest({ message: 'Invalid user id' })
+    }
+
     const user = await User.find(id)
 
     if (!user) {

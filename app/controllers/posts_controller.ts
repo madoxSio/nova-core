@@ -20,9 +20,11 @@ export default class PostsController {
    * @requestBody <Post>
    * @responseBody 200 - <Post>
    */
-  public async store({ request, response }: HttpContext) {
+  public async store({ auth, request, response }: HttpContext) {
     const { content } = request.only(['content'])
-    const post = await Post.create({ content })
+    const user = auth.getUserOrFail()
+
+    const post = await Post.create({ content, userId: user.id })
     return response.json(post)
   }
 
@@ -34,6 +36,11 @@ export default class PostsController {
    */
   public async show({ request, response }: HttpContext) {
     const { id } = request.params()
+
+    if (Number.isNaN(+id)) {
+      return response.badRequest({ message: 'Invalid post id' })
+    }
+
     const post = await Post.find(id)
     return response.json(post)
   }
@@ -47,6 +54,11 @@ export default class PostsController {
   public async update({ request, response }: HttpContext) {
     const { id } = request.params()
     const { content } = request.only(['content'])
+
+    if (Number.isNaN(+id)) {
+      return response.badRequest({ message: 'Invalid post id' })
+    }
+
     const post = await Post.find(id)
 
     if (!post) {
@@ -66,6 +78,11 @@ export default class PostsController {
    */
   public async destroy({ request, response }: HttpContext) {
     const { id } = request.params()
+
+    if (Number.isNaN(+id)) {
+      return response.badRequest({ message: 'Invalid post id' })
+    }
+
     const post = await Post.find(id)
 
     if (!post) {
@@ -84,6 +101,11 @@ export default class PostsController {
    */
   public async like({ request, response }: HttpContext) {
     const { id } = request.params()
+
+    if (Number.isNaN(+id)) {
+      return response.badRequest({ message: 'Invalid post id' })
+    }
+
     const post = await Post.find(id)
 
     if (!post) {

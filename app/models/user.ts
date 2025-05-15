@@ -7,6 +7,7 @@ import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import Post from '#models/post'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { UserRole } from '../types/enums.js'
+import PostComment from '#models/post_comment'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -48,6 +49,10 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @hasMany(() => Post)
   // @no-swagger
   declare posts: HasMany<typeof Post>
+
+  @hasMany(() => PostComment)
+  // @no-swagger
+  declare postComments: HasMany<typeof PostComment>
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
