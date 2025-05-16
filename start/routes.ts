@@ -15,6 +15,7 @@ import { middleware } from './kernel.js'
 const AuthController = () => import('#controllers/auth_controller')
 const UsersController = () => import('#controllers/users_controller')
 const PostsController = () => import('#controllers/posts_controller')
+const ValidateNumericIdMiddleware = () => import('#middleware/validate_numeric_id_middleware')
 
 router.get('/swagger', async () => {
   return AutoSwagger.default.docs(router.toJSON(), swagger)
@@ -52,7 +53,7 @@ router
             // Users routes
             router.get('/', [UsersController, 'index'])
             router.get('/me', [UsersController, 'me'])
-            router.get('/:id', [UsersController, 'show'])
+            router.get('/:id', [UsersController, 'show']).use(middleware.validateNumericId())
           })
           .middleware(middleware.auth({ guards: ['api'] }))
           .prefix('/users')
@@ -62,10 +63,13 @@ router
             // Posts routes
             router.get('/', [PostsController, 'index'])
             router.post('/', [PostsController, 'store'])
-            router.get('/:id', [PostsController, 'show'])
-            router.put('/:id', [PostsController, 'update'])
-            router.delete('/:id', [PostsController, 'destroy'])
-            router.post('/:id/like', [PostsController, 'like'])
+            router.get('/:id', [PostsController, 'show']).use(middleware.validateNumericId())
+            router.put('/:id', [PostsController, 'update']).use(middleware.validateNumericId())
+            router.delete('/:id', [PostsController, 'destroy']).use(middleware.validateNumericId())
+            router.post('/:id/like', [PostsController, 'like']).use(middleware.validateNumericId())
+            router
+              .post('/:id/comment', [PostsController, 'comment'])
+              .use(middleware.validateNumericId())
           })
           .middleware(middleware.auth({ guards: ['api'] }))
           .prefix('/posts')

@@ -8,8 +8,14 @@ export default class PostComment extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
 
+  @column()
+  declare postId: number
+
   @belongsTo(() => Post)
   declare post: BelongsTo<typeof Post>
+
+  @column()
+  declare userId: number
 
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>

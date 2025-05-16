@@ -42,5 +42,6 @@ router.use([
  * the routes or the routes group.
  */
 export const middleware = router.named({
+  validateNumericId: () => import('#middleware/validate_numeric_id_middleware'),
   auth: () => import('#middleware/auth_middleware'),
 })

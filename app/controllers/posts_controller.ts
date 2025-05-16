@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Post from '#models/post'
+import PostComment from '#models/post_comment'
 
 export default class PostsController {
   /**
@@ -8,9 +9,9 @@ export default class PostsController {
    * @requestBody <Post>
    * @responseBody 200 - <Post>
    */
-  public async index({ request, response }: HttpContext) {
-    const { page = 1, limit = 10 } = request.only(['page', 'limit'])
-    const posts = await Post.query().paginate(page, limit)
+  public async index({ response, logger }: HttpContext) {
+    const posts = await Post.query().preload('comments')
+    logger.info(posts)
     return response.json(posts)
   }
 
@@ -24,7 +25,7 @@ export default class PostsController {
     const { content } = request.only(['content'])
     const user = auth.getUserOrFail()
 
-    const post = await Post.create({ content, userId: user.id })
+    const post = await Post.create({ content, userId: user.id, likes: 0 })
     return response.json(post)
   }
 
@@ -36,11 +37,6 @@ export default class PostsController {
    */
   public async show({ request, response }: HttpContext) {
     const { id } = request.params()
-
-    if (Number.isNaN(+id)) {
-      return response.badRequest({ message: 'Invalid post id' })
-    }
-
     const post = await Post.find(id)
     return response.json(post)
   }
@@ -54,10 +50,6 @@ export default class PostsController {
   public async update({ request, response }: HttpContext) {
     const { id } = request.params()
     const { content } = request.only(['content'])
-
-    if (Number.isNaN(+id)) {
-      return response.badRequest({ message: 'Invalid post id' })
-    }
 
     const post = await Post.find(id)
 
@@ -78,11 +70,6 @@ export default class PostsController {
    */
   public async destroy({ request, response }: HttpContext) {
     const { id } = request.params()
-
-    if (Number.isNaN(+id)) {
-      return response.badRequest({ message: 'Invalid post id' })
-    }
-
     const post = await Post.find(id)
 
     if (!post) {
@@ -101,11 +88,6 @@ export default class PostsController {
    */
   public async like({ request, response }: HttpContext) {
     const { id } = request.params()
-
-    if (Number.isNaN(+id)) {
-      return response.badRequest({ message: 'Invalid post id' })
-    }
-
     const post = await Post.find(id)
 
     if (!post) {
@@ -115,5 +97,27 @@ export default class PostsController {
     post.likes++
     await post.save()
     return response.json(post)
+  }
+
+  /**
+   * @comment
+   * @description Comment on a post by id
+   * @requestBody <Post>
+   * @responseBody 200 - <Post>
+   */
+  public async comment({ auth, request, response, logger }: HttpContext) {
+    const { id } = request.params()
+    const { content } = request.only(['content'])
+
+    logger.info({ id, content }, 'Commenting on post')
+
+    const post = await Post.find(id)
+
+    if (!post) {
+      return response.status(404).json({ message: 'Post not found' })
+    }
+
+    const comment = await PostComment.create({ content, postId: post.id, userId: auth.user?.id })
+    return response.json(comment)
   }
 }
