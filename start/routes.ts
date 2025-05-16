@@ -15,7 +15,6 @@ import { middleware } from './kernel.js'
 const AuthController = () => import('#controllers/auth_controller')
 const UsersController = () => import('#controllers/users_controller')
 const PostsController = () => import('#controllers/posts_controller')
-const ValidateNumericIdMiddleware = () => import('#middleware/validate_numeric_id_middleware')
 
 router.get('/swagger', async () => {
   return AutoSwagger.default.docs(router.toJSON(), swagger)

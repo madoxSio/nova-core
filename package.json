@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node bin/server.js",
     "build": "node ace build",
-    "dev": "node ace serve --hmr",
+    "dev": "node ace serve --watch",
+    "dev:hmr": "node ace serve --hmr",
     "test": "node ace test",
     "lint": "eslint .",
     "format": "prettier --write .",
@@ -29,7 +30,9 @@
     "#database/*": "./database/*.js",
     "#start/*": "./start/*.js",
     "#tests/*": "./tests/*.js",
-    "#config/*": "./config/*.js"
+    "#config/*": "./config/*.js",
+    "#interfaces/*": "./interfaces/*.js",
+    "#enums/*": "./enums/*.js"
   },
   "devDependencies": {
     "@adonisjs/assembler": "^7.8.2",

@@ -1,13 +1,14 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Post from '#models/post'
 import PostComment from '#models/post_comment'
+import { createPostValidator } from '#validators/create_post'
 
 export default class PostsController {
   /**
    * @index
    * @description Get all posts
    * @requestBody <Post>
-   * @responseBody 200 - <Post>
+   * @responseBody 200 - <Post[]>.with(relations).exclude(user)
    */
   public async index({ response, logger }: HttpContext) {
     const posts = await Post.query().preload('comments')
@@ -18,14 +19,14 @@ export default class PostsController {
   /**
    * @store
    * @description Create a new post
-   * @requestBody <Post>
+   * @requestBody <createPostValidator>
    * @responseBody 200 - <Post>
    */
   public async store({ auth, request, response }: HttpContext) {
-    const { content } = request.only(['content'])
+    const payload = await createPostValidator.validate(request.only(['content']))
     const user = auth.getUserOrFail()
 
-    const post = await Post.create({ content, userId: user.id, likes: 0 })
+    const post = await Post.create({ content: payload.content, userId: user.id, likes: 0 })
     return response.json(post)
   }
 
