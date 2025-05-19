@@ -63,7 +63,6 @@ router
             router.get('/', [PostsController, 'index'])
             router.post('/', [PostsController, 'store'])
             router.get('/:id', [PostsController, 'show']).use(middleware.validateNumericId())
-            router.put('/:id', [PostsController, 'update']).use(middleware.validateNumericId())
             router.delete('/:id', [PostsController, 'destroy']).use(middleware.validateNumericId())
             router.post('/:id/like', [PostsController, 'like']).use(middleware.validateNumericId())
             router

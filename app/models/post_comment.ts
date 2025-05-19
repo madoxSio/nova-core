@@ -9,6 +9,9 @@ export default class PostComment extends BaseModel {
   declare id: number
 
   @column()
+  declare likes: number
+
+  @column()
   declare postId: number
 
   @belongsTo(() => Post)

@@ -20,6 +20,10 @@ export default class Post extends BaseModel {
   @column()
   declare likes: number
 
+  @column()
+  // @example(https://example.com/image.jpg)
+  declare image: string | null
+
   @hasMany(() => PostComment)
   declare comments: HasMany<typeof PostComment>
 
