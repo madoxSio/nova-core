@@ -26,13 +26,32 @@ services:
     container_name: minio
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: password
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-password}
     ports:
       - '9000:9000' # S3 endpoint
       - '9001:9001' # Admin console
     volumes:
       - miniodata:/data
+    networks:
+      - minio-net
+
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+        sleep 5;
+        mc alias set local http://minio:9000 ${MINIO_ROOT_USER:-admin} ${MINIO_ROOT_PASSWORD:-password};
+        mc mb -p local/${S3_BUCKET};
+        mc anonymous set download local/${S3_BUCKET};
+      "
+    networks:
+      - minio-net
+
+networks:
+  minio-net:
 
 volumes:
   pgdata:
