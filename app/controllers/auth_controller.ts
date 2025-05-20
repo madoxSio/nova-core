@@ -4,6 +4,9 @@ import User from '#models/user'
 import hash from '@adonisjs/core/services/hash'
 import { createAuthValidator } from '#validators/auth'
 import { loginValidator } from '#validators/login'
+import drive from '@adonisjs/drive/services/main'
+import { readFile } from 'node:fs/promises'
+import { v4 as uuid } from 'uuid'
 
 export default class AuthController {
   /**
@@ -16,7 +19,15 @@ export default class AuthController {
    */
   public async store({ request, response, logger }: HttpContext) {
     const payload = await createAuthValidator.validate(
-      request.only(['email', 'password', 'firstName', 'lastName', 'birthDate', 'username'])
+      request.only([
+        'email',
+        'password',
+        'firstName',
+        'lastName',
+        'birthDate',
+        'username',
+        'avatar',
+      ])
     )
 
     logger.info({ payload }, 'Trying to create user')
@@ -31,7 +42,35 @@ export default class AuthController {
       return response.badRequest({ message: 'Username already exists' })
     }
 
-    const user = await User.create(payload)
+    const user = new User()
+
+    if (payload.avatar) {
+      const fileName = `${uuid()}.${payload.avatar.extname}`
+      const fileBuffer = await readFile(payload.avatar.tmpPath!)
+      await drive.use('s3').put(`users/${fileName}`, fileBuffer, {
+        contentType: payload.avatar.type,
+        visibility: 'public',
+      })
+
+      user.avatar = await drive.use('s3').getUrl(`users/${fileName}`)
+      logger.info({ avatar: user.avatar }, 'Avatar uploaded')
+    } else {
+      user.avatar = null
+    }
+
+    user.fill({
+      email: payload.email,
+      password: payload.password,
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      birthDate: payload.birthDate,
+      username: payload.username,
+      avatar: user.avatar,
+    })
+
+    logger.info({ user }, 'User created')
+
+    await user.save()
     return response.created(user)
   }
 

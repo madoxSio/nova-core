@@ -46,6 +46,10 @@ export default class User extends compose(BaseModel, AuthFinder) {
   // @example(MyP@ssw0rd!)
   declare password: string
 
+  @column()
+  // @example(https://example.com/avatar.png)
+  declare avatar: string | null
+
   @hasMany(() => Post)
   // @no-swagger
   declare posts: HasMany<typeof Post>

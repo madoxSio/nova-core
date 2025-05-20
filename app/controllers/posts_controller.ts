@@ -40,12 +40,12 @@ export default class PostsController {
     if (image) {
       const fileName = `${uuid()}.${image.extname}`
       const fileBuffer = await readFile(image.tmpPath!)
-      await drive.use('s3').put(fileName, fileBuffer, {
+      await drive.use('s3').put(`posts/${fileName}`, fileBuffer, {
         contentType: image.type,
         visibility: 'public',
       })
 
-      post.image = await drive.use('s3').getUrl(fileName)
+      post.image = await drive.use('s3').getUrl(`posts/${fileName}`)
     }
 
     await post.save()
@@ -89,6 +89,10 @@ export default class PostsController {
 
     if (post.userId !== user.id) {
       return response.status(403).json({ message: 'You are not authorized to delete this post' })
+    }
+
+    if (post.image) {
+      await drive.use('s3').delete(`posts/${post.image.split('/').pop()}`)
     }
 
     await post.delete()

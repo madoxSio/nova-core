@@ -10,5 +10,11 @@ export const createAuthValidator = vine.compile(
     }),
     email: vine.string().trim().email(),
     password: vine.string().trim().minLength(6).maxLength(20),
+    avatar: vine
+      .file({
+        size: 1024 * 1024 * 5, // 5MB
+        extnames: ['jpg', 'jpeg', 'png', 'gif'],
+      })
+      .nullable(),
   })
 )
