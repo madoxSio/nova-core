@@ -144,7 +144,7 @@ This project is private and unlicensed.
 
 ## 👥 Authors
 
-- [@sagby](https://github.com/sagby)
+- [@Sagbyy](https://github.com/Sagbyy)
 - [@madoxSio](https://github.com/madoxSio)
 
 ## 🙏 Acknowledgments
