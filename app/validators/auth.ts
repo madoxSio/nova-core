@@ -15,6 +15,7 @@ export const createAuthValidator = vine.compile(
         size: 1024 * 1024 * 5, // 5MB
         extnames: ['jpg', 'jpeg', 'png', 'gif'],
       })
+      .optional()
       .nullable(),
   })
 )
